@@ -6,7 +6,7 @@
 /**
  * A 16-bit counter with load and reset control bits.
  * if      (reset[t] == 1) out[t+1] = 0
- * else if (load[t] == 1)  out[t+1] = in[t]
+ * else if (load[t] == 1)  out[t+1] = in[t]     
  * else if (inc[t] == 1)   out[t+1] = out[t] + 1  (integer addition)
  * else                    out[t+1] = out[t]
  */
@@ -17,4 +17,11 @@ CHIP PC {
 
     PARTS:
     // Put your code here:
+    Inc16(in=o3,out=o1);
+    Mux8Way16(a=o3,b=o1,c=in,d=in,e=false,f=false,g=false,h=false,
+    sel[2]=reset,
+    sel[1]=load,
+    sel[0]=inc,
+    out=o2);
+    Register(in=o2,load=true,out=o3,out=out);
 }
