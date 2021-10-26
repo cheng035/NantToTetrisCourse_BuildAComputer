@@ -57,7 +57,8 @@ CHIP CPU {
    
     
     //implement D register
-    DRegister(in = aluOut , load = instruction[4] , out = regDout);
+    And(a=instruction[4],b=instruction[15],out=dLoad);
+    DRegister(in = aluOut , load = dLoad , out = regDout);
     
     
     //useMux to select between M instruction and A instruction (select the a bit)
