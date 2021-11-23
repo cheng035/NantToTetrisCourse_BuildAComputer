@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 import javafx.util.Pair;
 
 public class Assembler {
+
     static int address = 16;
     private static HashMap<String, Integer> symbolTable;
     private static HashMap<String, String> jumpTable;

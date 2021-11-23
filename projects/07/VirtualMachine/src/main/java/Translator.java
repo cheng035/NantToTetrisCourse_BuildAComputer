@@ -153,7 +153,7 @@ private void translateCommand(String[] command){
      * @param command input command
      */
     private void pushBasic (String[] command){
-        getAddressContent(command[2], addressMap.get(command[1]));
+        getAddressContent(addressMap.get(command[1]),command[2]);
         writeToStack();
     }
 
@@ -189,11 +189,13 @@ private void translateCommand(String[] command){
     private void pushTemp(String[] command){
         int add = 5 + Integer.parseInt(command[2]);
         outputCommands.add("@"+add);
+        outputCommands.add("D=M");
         writeToStack();
     }
 
     private void pushPointer(String[] command){
         goToPointerAddress(command);
+        outputCommands.add("D=M");
         writeToStack();
 
     }
@@ -221,7 +223,7 @@ private void translateCommand(String[] command){
 
     private void popStatic(String[] command){
         popStack();
-        outputCommands.add("@foo."+command[2]);
+        outputCommands.add("@Foo."+command[2]);
         outputCommands.add("M=D");
     }
 
@@ -234,6 +236,7 @@ private void translateCommand(String[] command){
 
     private void popPointer(String[] command){
         goToPointerAddress(command);
+        outputCommands.add("D=A");
         saveAddress();
         popStack();
         writeToSavedAddress();
@@ -262,7 +265,6 @@ private void translateCommand(String[] command){
         }
 
         outputCommands.add("@"+addr);
-        outputCommands.add("D=M");
     }
 
 
@@ -293,16 +295,19 @@ private void translateCommand(String[] command){
     private void compare(String compare){
         popStack();
         goToStack();
+        outputCommands.add("A=A-1");
         outputCommands.add("D=M-D");
         outputCommands.add("@EQUAL"+count);
         outputCommands.add(compare);
         goToStack();
+        outputCommands.add("A=A-1");
         outputCommands.add("M=0");
         outputCommands.add("@END"+count);
         outputCommands.add("0;JMP");
-        outputCommands.add(String.format("(EQUALS%d)",count));
+        outputCommands.add(String.format("(EQUAL%d)",count));
         goToStack();
-        outputCommands.add("M=1");
+        outputCommands.add("A=A-1");
+        outputCommands.add("M=-1");
         outputCommands.add(String.format("(END%d)",count));
         count+=1;
     }
@@ -322,7 +327,7 @@ private void translateCommand(String[] command){
 
 
     private void add(){
-        opStack("M=M+D");
+        opStack("M=D+M");
     }
 
     private void sub(){
@@ -339,11 +344,13 @@ private void translateCommand(String[] command){
 
     private void not(){
         goToStack();
+        outputCommands.add("A=A-1");
         outputCommands.add("M=!M");
     }
 
     private void neg(){
         goToStack();
+        outputCommands.add("A=A-1");
         outputCommands.add("M=-M");
     }
 
