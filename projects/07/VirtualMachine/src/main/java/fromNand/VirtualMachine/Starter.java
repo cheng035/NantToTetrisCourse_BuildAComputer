@@ -1,6 +1,7 @@
 package fromNand.VirtualMachine;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import javax.annotation.Resource;
 import org.springframework.boot.CommandLineRunner;
@@ -23,8 +24,14 @@ public class Starter implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        List<String[]> commands = fileHandler.readFile();
-        translator.translateCommands(commands);
-        fileHandler.writeFile();
+        while (true) {
+            List<String[]> commands = fileHandler.readFile();
+            System.out.println("command is ");
+            commands.forEach(
+                c -> System.out.println(Arrays.toString(c))
+            );
+            translator.translateCommands(commands);
+            fileHandler.writeFile();
+        }
     }
 }

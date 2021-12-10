@@ -20,4 +20,12 @@ public class CommandOutput {
     public void add(String command){
         outputList.add(command);
     }
+
+    public void addToPrevious(int k, String toString) {
+        outputList.set(k,outputList.get(k)+"   //"+toString);
+    }
+
+    public int getSize() {
+        return outputList.size();
+    }
 }

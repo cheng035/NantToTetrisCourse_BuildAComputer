@@ -2,7 +2,6 @@ package fromNand.VirtualMachine;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import javax.annotation.Resource;
 import lombok.Data;
@@ -19,6 +18,9 @@ public class Translator {
     @Resource
     CommandOutput commandOutput;
 
+    @Resource
+    FunctionService functionService;
+
     private static HashMap<String, String> addressMap;
 
     int count = 0;
@@ -33,19 +35,18 @@ public class Translator {
     public void translateCommands(List<String[]> commands) {
 
         for (String[] command : commands){
-
-            commandOutput.add("//"+ Arrays.toString(command));
+            int k = commandOutput.getSize();
             translateCommand(command);
-
+            commandOutput.addToPrevious(k,Arrays.toString(command));
         }
-        addEnd();
 
     }
 
 
 
 private void translateCommand(String[] command){
-    if (command.length == 3 && command[0].equals("push")){
+
+    if (command[0].equals("push")){
         if(addressMap.containsKey(command[1]))
             memoryService.pushBasic(command);
         else if(command[1].equals("constant"))
@@ -57,6 +58,36 @@ private void translateCommand(String[] command){
             memoryService.pushTemp(command);
         else
             memoryService.pushPointer(command);
+    }
+
+    else if (command[0].equals("function")){
+        System.out.println("function"+command[1]);
+        if(functionService.getFunctionName()!=null
+            && functionService.getFunctionName().equals("Sys.init")){
+        }
+        functionService.setFunctionName(command[1]);
+        functionService.initializeFunction(command);
+    }
+
+    else if(command[0].equals("return")){
+        functionService.returnFunction();
+    }
+
+    else if(command[0].equals("call")){
+        functionService.callFunction(command);
+    }
+
+    else if(command[0].equals("label")){
+        functionService.label(command);
+    }
+
+
+    else if(command[0].equals("if-goto")){
+        functionService.ifGoTo(command);
+    }
+
+    else if(command[0].equals("goto")){
+        functionService.goTo(command);
     }
 
     else if (command.length == 3 &&command[0].equals("pop")){
@@ -122,20 +153,7 @@ private void translateCommand(String[] command){
         }
         
     }
+
+
 }
-
-
-
-
-
-
-
-
-    private void addEnd(){
-        commandOutput.add("(END)");
-        commandOutput.add("@END");
-        commandOutput.add("0;JMP");
-    }
-
-
 }
