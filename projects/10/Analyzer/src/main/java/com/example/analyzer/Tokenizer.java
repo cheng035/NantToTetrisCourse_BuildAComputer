@@ -3,7 +3,6 @@ package com.example.analyzer;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +10,7 @@ import org.springframework.stereotype.Service;
 @Data
 public class Tokenizer {
     LinkedList<Token> tokenList;
+    Integer cur = 0;
     static HashSet<String> keywordSet = new HashSet<String>() {{
         add("class");add("constructor");add("function");add("method");
         add("field");add("static");add("var");add("int");
@@ -27,8 +27,23 @@ public class Tokenizer {
         }};
 
 
+    public boolean hasMoreTokens(){
+        return cur < tokenList.size();
+    }
+    public Token getCurrent(){
+        return tokenList.get(cur);
+    }
+
+    public Token advance(){
+        if(hasMoreTokens()){
+            cur+=1;
+        }
+        return tokenList.get(cur);
+
+    }
     public void init (List<String> jacks) {
         this.tokenList = new LinkedList<>();
+        tokenList.add(null);
         jacks.forEach(
             this::handleString
         );
@@ -110,13 +125,4 @@ public class Tokenizer {
 
     private void addToken(String s, TokenType type) {
         this.tokenList.add(new Token(s,type));
-    }
-
-@Data
-@AllArgsConstructor
-    static class Token {
-        String token;
-        TokenType type;
-    }
-
-}
+    }}
